@@ -4,7 +4,7 @@
 #define D 2.54
 #define K 2.32166
 #define C 2.7076
-// Ηΰδΰνθε 2
+// Γ‡Γ Γ¤Γ Γ­Γ¨Γ¥ 2
 int main()
 {
 	setlocale(LC_ALL, "RUS");
