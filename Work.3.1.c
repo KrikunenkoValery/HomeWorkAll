@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <locale.h>
-// Ηΰδΰνθε 1
+// Γ‡Γ Γ¤Γ Γ­Γ¨Γ¥ 1
 int main()
 {
 	setlocale(LC_ALL, "RUS");
