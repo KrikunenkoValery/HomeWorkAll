@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <locale.h> 
+#include <math.h>
+#define _CRT_SECURE_NO_WARNINGS
+
+int main(void)
+{
+	// 1 задание
+	int years;
+	setlocale(LC_ALL, "RUS");
+	printf("Год \t");
+	scanf("%d", &years);
+	if ((years % 4 == 0 || years % 400 == 0) && years % 100 != 0)
+		printf("%d - Этот год високосный\n", years);
+	else
+		printf("Не угадали\n");
+
+	// 2 задание 
+
+	double x; 
+	printf("Введите X:"); 
+	scanf("%lf", &x); 
+	if (x >= 8) 
+		printf("%lf\n", - pow(x, 3) - x - 9);
+	else
+		printf("%lf\n", (1. / (pow(x, 4.) - 6.)));  
+	//3 Задание Вариант 10
+
+    int d1, m1, y1, d2, m2, y2;
+    printf("Дата рождения человека 1.\nЧисло:");
+    scanf("%d", &d1);
+    printf("Месяц:");
+    scanf("%d", &m1);
+    printf("Год:");
+    scanf("%d", &y1);
+    printf("Введите дату человека 2.\nЧисло:");
+    scanf("%d", &d2);
+    printf("Месяц:");
+    scanf("%d", &m2);
+    printf("Год:");
+	scanf("%d", &y2);
+	if (y1 < y2 || (y1 == y2 && (m1 < m2 || (m1 == m2 && d1 < d2))))
+		printf("\nПервый старше\n");
+	else 
+		printf("\n Второй старше\n");
+}
