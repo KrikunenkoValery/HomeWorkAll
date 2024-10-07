@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <locale.h>
+#include <math.h>
+double main(void)
+{
+    // Задание 1
+    int m, n, i, S = 0, k = 0;
+    setlocale(LC_ALL, "RUS");
+    printf("Введите начальное значение m: ");
+    scanf("%d", &m);
+    printf("Введите конечное значение n: ");
+    scanf("%d", &n);
+    for (i = m; i >= n; i--) {
+        S += i;
+        k += 1;
+    }
+    printf("Выполнено %d раз\n", k);
+    printf("Сумма чисел от %d до %d равна: %d\n", m, n, S); 
+
+
+    // Задание 2
+    double a, b, result, x;
+    double step;
+    printf("Функция |ln(x)| - (x - 2)^2 \n");
+    printf("Введите начальное значение x: ");
+    scanf("%lf", &a); 
+    printf("Введите конечное значение x: ");
+    scanf("%lf", &b);
+    printf("шаг: ");
+    scanf("%lf", &step);
+    for (x = a; x <= b; x += step) {
+        result = fabs(log10(x)) - pow((x + 2), 2); 
+        printf("| %.2lf | %.2lf |\n", x, result);
+        printf("----------------\n");
+    
+    }
+    // Задание 3 
+    double res1 = 1.0, res2 = 1.0, o;
+    printf("Введите x: ");
+    scanf("%lf", &x);
+    for (o = 1; o <= 63; o += 2) {
+        res1 *= (x - o);
+    }
+    for (int i = 0; i <= 6; i++) {
+        res2 *= (x - (pow(2, i)));
+    }
+    double res = res1 / res2;
+    printf("%lf", res); 
+}
