@@ -2,52 +2,123 @@
 #include <locale.h>
 #include <math.h>
 
-int ar(const char* roman) 
-{
-	int arabic = 0;
+int toint(char* roman) {
+    int value = 0;
 
-	for (int i = 0; roman[i] != '\0'; i++) 
-	{
-		int currentValue = 0;
+    switch (roman[0]) {
+    case 'M': value += 1000; break;
+    case 'D': value += 500; break;
+    case 'C':
+        switch (roman[1]) {
+        case 'M': value += 900; break;
+        case 'D': value += 400; break;
+        default: value += 100; break;
+        }
+        break;
+    case 'L': value += 50; break;
+    case 'X':
+        switch (roman[1]) {
+        case 'C': value += 90; break;
+        case 'L': value += 40; break;
+        default: value += 10; break;
+        }
+        break;
+    case 'V': value += 5; break;
+    case 'I':
+        switch (roman[1]) {
+        case 'X': value += 9; break;
+        case 'V': value += 4; break;
+        default: value += 1; break;
+        }
+        break;
+    }
 
-		switch (roman[i]) 
-		{
-		case 'I': 
-			currentValue = 1; 
-			break;
-		case 'V': 
-			currentValue = 5; 
-			break;
-		case 'X': 
-			currentValue = 10; 
-			break;
-		case 'L': 
-			currentValue = 50;
-			break;
-		case 'C': 
-			currentValue = 100; 
-			break;
-		case 'D': 
-			currentValue = 500; 
-			break;
-		case 'M': 
-			currentValue = 1000; 
-			break;
-		}
+    // Проверяем следующие символы
+    switch (roman[1]) {
+    case 'M': value += 1000; break;
+    case 'D': value += 500; break;
+    case 'C':
+        switch (roman[2]) {
+        case 'M': value += 900; break;
+        case 'D': value += 400; break;
+        default: value += 100; break;
+        }
+        break;
+    case 'L': value += 50; break;
+    case 'X':
+        switch (roman[2]) {
+        case 'C': value += 90; break;
+        case 'L': value += 40; break;
+        default: value += 10; break;
+        }
+        break;
+    case 'V': value += 5; break;
+    case 'I':
+        switch (roman[2]) {
+        case 'X': value += 9; break;
+        case 'V': value += 4; break;
+        default: value += 1; break;
+        }
+        break;
+    }
 
-		if (currentValue > (roman[i - 1] ? roman[i - 1] : 'I')) 
-		{
-			arabic += currentValue - 2 * (roman[i - 1] ? (roman[i - 1] == 'I' ? 1 :
-				roman[i - 1] == 'V' ? 5 : roman[i - 1] == 'X' ? 10 :
-				roman[i - 1] == 'L' ? 50 : roman[i - 1] == 'C' ? 100 :
-				roman[i - 1] == 'D' ? 500 : 1000) : 0);
-		}
-		else {
-			arabic += currentValue;
-		}
-	}
+    switch (roman[2]) {
+    case 'M': value += 1000; break;
+    case 'D': value += 500; break;
+    case 'C':
+        switch (roman[3]) {
+        case 'M': value += 900; break;
+        case 'D': value += 400; break;
+        default: value += 100; break;
+        }
+        break;
+    case 'L': value += 50; break;
+    case 'X':
+        switch (roman[3]) {
+        case 'C': value += 90; break;
+        case 'L': value += 40; break;
+        default: value += 10; break;
+        }
+        break;
+    case 'V': value += 5; break;
+    case 'I':
+        switch (roman[3]) {
+        case 'X': value += 9; break;
+        case 'V': value += 4; break;
+        default: value += 1; break;
+        }
+        break;
+    }
 
-	return arabic;
+    switch (roman[3]) {
+    case 'M': value += 1000; break;
+    case 'D': value += 500; break;
+    case 'C':
+        switch (roman[4]) {
+        case 'M': value += 900; break;
+        case 'D': value += 400; break;
+        default: value += 100; break;
+        }
+        break;
+    case 'L': value += 50; break;
+    case 'X':
+        switch (roman[4]) {
+        case 'C': value += 90; break;
+        case 'L': value += 40; break;
+        default: value += 10; break;
+        }
+        break;
+    case 'V': value += 5; break;
+    case 'I':
+        switch (roman[4]) {
+        case 'X': value += 9; break;
+        case 'V': value += 4; break;
+        default: value += 1; break;
+        }
+        break;
+    }
+
+    return value;
 }
 
 int main()
@@ -98,13 +169,11 @@ int main()
 	}
 	// Задание 3 
 	
-	char roman[20];
-
-	printf("Введите римские цифры: ");
-	scanf("%s", roman);
-
-	printf("Арабское число: %d\n", ar(roman));
-
-	return 0;
+    char roman[16];
+    printf("Введите год в римских цифрах: ");
+    scanf("%s", roman);
+    int arabicValue = toint(roman);
+    printf("Арабское значение: %d\n", arabicValue);
+    return 0;
 
 }
