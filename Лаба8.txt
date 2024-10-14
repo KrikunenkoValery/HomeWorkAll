@@ -41,7 +41,7 @@ double main(void)
     for (o = 1; o <= 63; o += 2) {
         res1 *= (x - o);
     }
-    for (int i = 0; i <= 6; i++) {
+    for (int i = 1; i <= 64; i+=3) {
         res2 *= (x - (pow(2, i)));
     }
     double res = res1 / res2;
