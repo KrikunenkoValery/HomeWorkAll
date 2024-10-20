@@ -1,0 +1,107 @@
+#include <stdio.h>
+#include <locale.h>
+#include <math.h>
+#include <stdlib.h>
+#define N 10
+#define SIZE 100
+
+
+float calculateValue() {
+    return (float)(rand()/100) - (rand()/100); // Случайное значение от -100 до 100 
+}
+int truncate(float value) 
+{
+    return (int)value;
+}
+int main(void)
+{
+    // Задание 1
+    setlocale(LC_ALL, "RUS");
+    float A[N], ave;
+    float sum = 0.0f;
+    // Ввод значений в массив
+    for (int i = 0; i < N; i++)
+    {
+        printf("Введи A[%d]: ", i + 1);
+        scanf("%f", &A[i]);
+        sum += A[i];
+    }
+    ave = sum / N;
+    // Вывод всех значений массива
+    printf("Элементы массива A:\n");
+    for (int i = 0; i < N; i++)
+    {
+        printf("A[%d]: %f\n", i + 1, A[i]);
+    }
+    printf("|%7s|%19s|%18s|\n", "индекс", "исходное значение", "новое значение");
+    printf("|-------|-------------------|------------------|\n");
+    for (int i = 0; i < N; i++)
+    {
+        printf("|%7d|%19.2f|%18.0f|\n", i + 1, A[i], ceil(A[i]));
+    }
+    for (int i = 0; i < N; i++)
+    {
+        A[i] = ceil(A[i]);
+    }
+    printf("Среднее арифметическое: %.2f\n", ave);
+    /*printf("Округленные элементы массива A:\n");
+    for (int i = 0; i < N; i++)
+    {
+        printf("A[%d]: %.0f\n", i + 1, A[i]);
+    }*/
+    
+    // Задание 2
+    float B[SIZE];
+    int positiveSum = 0, negativeSum = 0;
+    int positiveCount = 0, negativeCount = 0;
+
+    // Генерация массива и подсчет сумм элементов
+    for (int o = 0; o < SIZE; o++) 
+    {
+        B[o] = truncate(calculateValue(o));
+        if (B[o] > 0) 
+        {
+            positiveSum += B[o];
+            positiveCount++;
+        }
+        else 
+        {
+            negativeSum += B[o];
+            negativeCount++;
+        }
+    }
+
+    // Вычисление среднего значения положительных элементов
+    float averagePositive = (float)positiveSum / positiveCount;
+
+    // Вывод результата
+    printf("Массив: A\n");
+    printf("Накопленное положительных: %d\n", positiveSum);
+    printf("Накопленное отрицательных: %d\n", negativeSum);
+    printf("Количество положительных: %d\n", positiveCount);
+    printf("Количество отрицательных: %d\n", negativeCount);
+    printf("Среднее положительных: %.2f\n", averagePositive);
+
+    // Задание 3
+    int n = 10;
+
+    double array[N]; 
+    printf("Введите элементы массива:\n");
+    for (int u = 0; u < n; u++) {
+        scanf("%lf", &array[u]);
+    }
+    int min_index = 0;
+    for (int u = 1; u < n; u++) {
+        if (fabs(array[u]) < fabs(array[min_index])) 
+        {
+            min_index = u;
+        }
+    }
+    double suma = 0;
+    for (int u = min_index + 1; u < n; u++) 
+    {
+        suma += array[u];
+    }
+
+    printf("Сумма элементов после минимального по модулю элемента: %.2f\n", suma);
+}
