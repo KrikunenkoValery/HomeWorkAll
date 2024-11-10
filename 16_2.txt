@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <locale.h>
+
+#define MIN_SIZE 10
+#define MAX_SIZE 50
+#define RANGE 100.0
+
+double* generate_array(int size) {
+    double* array = malloc(size * sizeof(double));
+    for (int i = 0; i < size; i++) {
+        array[i] = ((double)rand() / RAND_MAX * 2 - 1) * RANGE; // В диапазоне [-RANGE, RANGE]
+    }
+    return array;
+}
+
+double* concatenate_arrays(double* a, int size_a, int* d_size) {
+    double* c = malloc((size_a) * sizeof(double));
+    int c_index = 0;
+
+    // Сначала добавляем положительные элементы
+    for (int i = 0; i < size_a; i++) {
+        if (a[i] > 0) {
+            c[c_index++] = a[i];
+        }
+    }
+
+    // Затем добавляем отрицательные элементы в обратном порядке
+    for (int i = size_a - 1; i >= 0; i--) {
+        if (a[i] < 0) {
+            c[c_index++] = a[i];
+        }
+    }
+
+    *d_size = c_index; // Сохраняем размер нового массива
+    return c;
+}
+
+void print_array(double* array, int size, const char* name) {
+    printf("%s: ", name);
+    for (int i = 0; i < size; i++) {
+        printf("%.2lf ", array[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    setlocale(LC_ALL, "RUS");
+    int size_a = MIN_SIZE + rand() % (MAX_SIZE - MIN_SIZE + 1);
+    int size_b = MIN_SIZE + rand() % (MAX_SIZE - MIN_SIZE + 1);
+    int size_c = MIN_SIZE + rand() % (MAX_SIZE - MIN_SIZE + 1);
+
+    double* a = generate_array(size_a);
+    double* b = generate_array(size_b);
+    double* c = generate_array(size_c);
+
+    int size_d;
+    double* d = concatenate_arrays(a, size_a, &size_d);
+
+    print_array(a, size_a, "Массив 1");
+    print_array(b, size_b, "Массив 2");
+    print_array(c, size_c, "Массив 3");
+    print_array(d, size_d, "Массив вариант 10");
+
+    free(a);
+    free(b);
+    free(c);
+    free(d);
+
+    return 0;
+}
