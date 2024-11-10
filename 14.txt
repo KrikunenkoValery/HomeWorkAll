@@ -1,0 +1,92 @@
+#include stdio.h
+#include locale.h
+#include math.h
+#define N 10
+ Задание 1
+double put_elements(double array, int n) {
+    int sum = 0;
+    for (int i = 0; i  n; i++)
+    {
+        printf(Введи A[%d] , i);
+        scanf(%lf, &array[i]);
+    }
+    return array[N];
+}
+double print(double array, int n) {
+    for (int i = 0; i  n; i++) {
+        printf(array[%d] = %lfn, i, array[i]);
+    }
+    return array[N];
+}
+double calc_elements(double array, int n) {
+    double sum = 0.0;
+    for (int i = 0; i  n; i++) {
+        sum += array[i];
+    }
+    printf(%lfn, sum);
+    return array[N];
+}
+double sum_elements(double array, int begin, int end, int n) {
+    double sum1 = 0.0;
+    if (begin = end && end = n) { 
+        for (int i = begin; i  end; i++) {
+            sum1 += array[i]; 
+        }
+        printf(%lfn, sum1);
+    }
+    else {
+        printf(Нетn);
+    }
+    
+}
+double find_element(double array, int n, int element) 
+{
+    for (int i = 0; i  n; i++) {
+        if (array[i+1] == element) {
+            printf(%d, i);
+            return i;
+        }
+        else {
+            printf(НОУ);
+        }
+    }
+}
+int findMax(double array, int size, int type) {
+    int max = (type == 0)  array[0]  array[1];
+    for (int i = type; i  size; i += 2) {
+        if (array[i]  max) {
+            max = array[i];
+        }
+    }
+    return max;
+}
+
+int main(void)
+{
+    setlocale(LC_ALL, RUS);
+    double array[N];
+    int element;
+    int n, begin, end;
+    printf(Введите размер массива  );
+    scanf(%d, &n);
+    printf(Начало );
+    scanf(%d, &begin); 
+    printf(Конец );
+    scanf(%d, &end);
+    printf(element );
+    scanf(%d, &element); 
+    put_elements(array, n);
+    print(array, n);
+    calc_elements(array, n);
+    Задание 2
+    sum_elements(array, begin, end, n);
+    find_element(array, n, element);
+    задание 3
+    int size = sizeof(array)  sizeof(array[0]);
+    int maxEven = findMax(array, size, 0);  для чётных
+    int maxOdd = findMax(array, size, 1);  для нечётных
+
+    printf(Максимум на четных позициях %dn, maxEven);
+    printf(Максимум на нечетных позициях %dn, maxOdd);
+    free(array);
+}
