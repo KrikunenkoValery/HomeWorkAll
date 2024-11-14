@@ -1,0 +1,22 @@
+#include <stdio.h>
+#include <string.h>
+#include <locale.h>
+int main() {
+    char str[256];
+    char word[50];
+    int count = 0;
+    setlocale(LC_ALL, "RUS");
+    printf("Введите строку: ");
+    fgets(str, sizeof(str), stdin);
+    printf("Введите слово для поиска: ");
+    scanf("%s", word);
+    char* pos = strtok(str, " ");
+    while (pos != NULL) {
+        if (strcmp(pos, word) == 0) {
+            count++;
+        }
+        pos = strtok(NULL, " ");
+    }
+    printf("Слово %s встречается %d раз(а).\n", word, count);
+    return 0;
+}
