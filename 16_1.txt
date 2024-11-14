@@ -19,7 +19,7 @@ double* calc_elements(double* ptr_array, int size) {
     return new_array;
 }
 
-int delete_k(double* ptr_array, int size, int k) {
+int *delete_k(double* ptr_array, int size, int k) {
     int new_size = 0;
     printf("\nНовый массив c удалёнными k-элементами\n");
     for (int i = 0; i < size; i++) {
@@ -31,7 +31,7 @@ int delete_k(double* ptr_array, int size, int k) {
     return new_size;
 }
 
-int find_max_index(double* ptr_array, int size) {
+int *find_max_index(double* ptr_array, int size) {
     int max_index = 0;
     for (int i = 1; i < size; i++) {
         if (ptr_array[i] > ptr_array[max_index]) {
@@ -41,20 +41,34 @@ int find_max_index(double* ptr_array, int size) {
     return max_index;
 }
 
-double* insert_before_max(double* ptr_array, int size) {
+double *insert_before_max(double* ptr_array, int size) {
     int max_index = find_max_index(ptr_array, size);
-    double* new_array1 = (double*)malloc((size + 1) * sizeof(double));
+    double* new_array = (double*)realloc(ptr_array, size * sizeof(double));
 
     for (int i = 0, j = 0; i < size + 1; i++) {
         if (i == max_index) {
-            new_array1[i] = -999,0;
+            new_array[i] = -999,0;
             j--;
         }
         else {
-            new_array1[i] = ptr_array[j++];
+            new_array[i] = ptr_array[j++];
         }
     }
-    return new_array1;
+    return new_array;
+}
+int *insert(int* ptr_array, int* size, int index, int num) {
+    int size_n = (*size) + 1;
+    if (ptr_array == NULL) 
+        return NULL;
+    int* ptr_arr_n = (int*)realloc(ptr_array, size_n * sizeof(int));
+    if (ptr_arr_n == NULL) 
+        return ptr_array;
+    ptr_array = ptr_arr_n;
+    for (int i = size_n - 1; i > index; i--)
+        ptr_array[i] = ptr_array[i - 1];
+    ptr_array[index] = num;
+    *size = size_n;
+    return ptr_array;
 }
 
 int main(void) {
@@ -89,7 +103,6 @@ int main(void) {
     for (int i = 0; i < new_size + 1; i++) {
         printf("A[%d] = %lf\n", i, result_array[i]);
     }
-
     free(ptr_array);
     free(new_array);
     free(result_array);
