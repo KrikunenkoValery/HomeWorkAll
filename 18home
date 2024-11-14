@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <string.h>
+#include <locale.h>
+
+struct Computer {
+    char name[50];
+    float chastota; // в ГГц
+    int ram; // в ГБ
+    int hasDVD; // 0 - Нет, 1 - Да
+    float price; // в рублях
+};
+
+void printComputer(struct Computer comp) {
+    printf("Название: %s\n", comp.name);
+    printf("Частота: %.2f ГГц\n", comp.chastota);
+    printf("Объем оперативной памяти: %d ГБ\n", comp.ram);
+    printf("Наличие DVD ROM: %s\n", comp.hasDVD ? "Да" : "Нет");
+    printf("Стоимость: %.2f руб.\n\n", comp.price);
+}
+
+int main() {
+    setlocale(LC_ALL, "RUS");
+    struct Computer computers[5];
+    int count = 0;
+    printf("Введите данные о компьютере =) \n");
+    while (count < 5) {
+        printf("Введите название компьютера: ");
+        scanf("%s", computers[count].name);
+        printf("Введите частоту компьютера (в ГГц): ");
+        scanf("%f", &computers[count].chastota);
+        printf("Введите объем оперативной памяти компьютера (в ГБ): ");
+        scanf("%d", &computers[count].ram);
+        printf("Введите 1, если у компьютера есть DVD ROM, или 0, если нет: ");
+        scanf("%d", &computers[count].hasDVD);
+        printf("Введите стоимость компьютера (в рублях): ");
+        scanf("%f", &computers[count].price);
+        count++;
+        if (count >= 2) {
+            break;
+        }
+    }
+    printf("\nКомпьютеры с объемом оперативной памяти больше 10 ГБ:\n");
+    for (int i = 0; i < count; i++) {
+        if (computers[i].ram > 10) {
+            printComputer(computers[i]);
+        }
+    }
+}
