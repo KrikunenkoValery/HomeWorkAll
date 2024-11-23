@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <locale.h>
+#include <io.h>
+int main()
+{
+	setlocale(LC_ALL, "RUS");
+	srand(time(NULL));
+	char fname[20] = "number.txt";
+	FILE* out;
+	printf("Cozdanie file\n");
+	if ((out = fopen(fname, "wt")) == NULL)
+	{
+		printf("Mistake");
+		return 0;
+	}
+	for (int i = 0; i <= 20; i++) {
+		double number = ((double)rand() / RAND_MAX) * 2 - 1;
+		fprintf(out, "%f\n", number);
+	}
+	
+	fclose(out);
+	// Задание 2
+	char c;
+	int num;
+	char fnaame[20] = "temp.txt";
+	printf("Введите a если сделать новый файл\nВведите b если сделать запись в существующий\n\t ");
+	scanf("%c", &c);
+	switch (c)
+	{
+	case 'a':
+		if ((out = fopen(fnaame, "wt")) == NULL)
+		{
+			printf("Mistake");
+			return 0;
+		}
+		printf("Введите число:");
+		scanf("%d", &num);
+		fprintf(out, "%d\n", num);
+		printf("Файл создан");
+		break;
+	case 'b':
+		if ((out = fopen(fnaame, "a")) == NULL)
+		{
+			printf("Mistake");
+			return 0;
+			
+		}
+		printf("Введите число:");
+		scanf("%d", &num);
+		fprintf(out, "%d\n", num);
+		printf("Файл Обновлён");
+		break;
+	default:
+		printf("Неизвестный символ\n");
+	}
+	return 0;
+}
