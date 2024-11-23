@@ -1,0 +1,47 @@
+#include <io.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <locale.h>
+#include <math.h>
+
+int main()
+{
+	//Задание 1 
+	setlocale(LC_ALL, "RUS");
+	char fname[20] = "number.txt";
+	char fnamee[20] = "number2.txt";
+	FILE* in;
+	FILE* new;
+	int sum = 0, a;
+	int n = 0;
+	if ((in =  fopen(fname, "rt")) == NULL)
+	{
+		printf("Ошибка открытия файла");
+		return 0;
+	}
+	if ((new = fopen(fnamee, "wt")) == NULL)
+	{
+		fclose(in);
+		printf("Ошибка открытия файла");
+		return 0;
+	}
+	while (!feof(in))
+	{
+		for (int i = 0; i < 10; i++) {
+		fscanf(in, "%d", &a);
+		printf("%d\n", a);
+		sum += a;
+		n++;
+		int res = (int)ceil(a * 1.66);
+		fprintf(new, "%d\n", res);
+		}
+		printf("%d\n", sum);
+	}
+
+	fclose(in);
+	fclose(new);
+
+	//Задание 2
+	
+	
+}
