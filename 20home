@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <locale.h>
+#include <io.h>
+
+void replace(char* word) {
+    int length = strlen(word);
+    if (length > 0) {
+        word[length - 1] = '5';
+    }
+}
+
+int main() {
+    setlocale(LC_ALL, "RUS");
+    FILE* file;
+    char line[256];
+
+    file = fopen("winter.txt", "r");
+    if (file == NULL) {
+        perror("Не удалось открыть файл");
+        return EXIT_FAILURE;
+    }
+
+    FILE* output_file = fopen("output.txt", "w");
+    if (output_file == NULL) {
+        perror("Не удалось создать файл для записи");
+        fclose(file);
+        return EXIT_FAILURE;
+    }
+
+    while (fgets(line, sizeof(line), file)) {
+        char* token = strtok(line, " \n");
+
+        while (token != NULL) {
+            if (isalnum(token[strlen(token) - 1])) {
+                replace(token);
+            }
+            fprintf(output_file, "%s ", token);
+            token = strtok(NULL, " \n");
+        }
+        
+        fprintf(output_file, "\n");
+    }
+
+    fclose(file); 
+    fclose(output_file);
+     
+    printf("Преобразование завершено. Результат записан в output.txt\n"); 
+}
