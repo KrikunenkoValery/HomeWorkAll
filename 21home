@@ -35,13 +35,25 @@ void fillCornicesArray(cornice_t cornices[], int SIZE) {
     }
 }
 
-void print_cornice(cornice_t cornice) {
-    printf("| %2d  %4d  %4d || %s |\n", cornice.length, cornice.ceilingWidth, cornice.wallHeight, cornice.material);
+void save(cornice_t* cornices, int SIZE) {
+    FILE* file = fopen("cornices.txt", "w");
+    for (int i = 0; i < SIZE; i++) {
+        fprintf(file, "%d %d %d %s\n", cornices[i].length, cornices[i].ceilingWidth, cornices[i].wallHeight, cornices[i].material);
+    }
+    fclose(file);
+}
+
+void load(cornice_t* cornices, int SIZE) {
+    FILE* file = fopen("cornices.txt", "r");
+    for (int i = 0; i < SIZE; i++) {
+        fscanf(file, "%d %d %d %s", &cornices[i].length, &cornices[i].ceilingWidth, &cornices[i].wallHeight, cornices[i].material);
+    }
+    fclose(file);
 }
 
 void print_array(cornice_t* cornices, int SIZE) {
     for (int i = 0; i < SIZE; i++) {
-        print_cornice(cornices[i]);
+        printf("| %2d  %4d  %4d || %s |\n", cornices[i].length, cornices[i].ceilingWidth, cornices[i].wallHeight, cornices[i].material);
     }
 }
 
@@ -53,65 +65,36 @@ cornice_t* search_material(cornice_t* cornices, int SIZE, char* material) {
     return NULL;
 }
 
-int output_file(char* filename, cornice_t* cornices, int SIZE) {
-    FILE* file = fopen(filename, "w");
-    if (file == NULL) {
-        perror("Unable to open file for writing");
-        return -1;
-    }
-    fwrite(cornices, sizeof(cornice_t), SIZE, file);
-    fclose(file);
-    return 0;
-}
-
-int input_file(char* filename, cornice_t* cornices, int SIZE) {
-    FILE* file = fopen(filename, "r");
-    if (file == NULL) {
-        perror("Unable to open file for reading");
-        return -1;
-    }
-    fread(cornices, sizeof(cornice_t), SIZE, file);
-    fclose(file);
-    return 0;
-}
-
 int main() {
     int SIZE;
     setlocale(LC_ALL, "RUS");
-    printf("Введите число: \t");
+
+    printf("Введите число: ");
     scanf("%d", &SIZE);
+
     cornice_t* corns = (cornice_t*)malloc(SIZE * sizeof(cornice_t));
     fillCornicesArray(corns, SIZE);
+    save(corns, SIZE);
+
+    // Очищаем массив для загрузки из файла
+    memset(corns, 0, SIZE * sizeof(cornice_t));
+    load(corns, SIZE);
+
     print_array(corns, SIZE);
-
-    if (output_file("cornices.dat", corns, SIZE) != 0) {
-        free(corns);
-        return 1;
-    }
-
-    cornice_t* readCorns = (cornice_t*)malloc(SIZE * sizeof(cornice_t));
-    if (input_file("cornices.dat", readCorns, SIZE) != 0) {
-        free(corns);
-        free(readCorns);
-        return 1;
-    }
-
-    printf("\nДанные из файла:\n");
-    print_array(readCorns, SIZE);
 
     char material[20];
     printf("Введите материал для поиска: ");
     scanf("%s", material);
-    cornice_t* foundCornice = search_material(readCorns, SIZE, material);
+
+    cornice_t* foundCornice = search_material(corns, SIZE, material);
     if (foundCornice != NULL) {
         printf("Материал найден '%s': ", material);
-        print_cornice(*foundCornice);
+        printf("| %2d  %4d  %4d || %s |\n", foundCornice->length, foundCornice->ceilingWidth, foundCornice->wallHeight, foundCornice->material);
     }
     else {
         printf("Материал '%s' не найден.\n", material);
     }
 
     free(corns);
-    free(readCorns);
     return 0;
 }
