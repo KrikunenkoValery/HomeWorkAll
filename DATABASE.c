@@ -1,0 +1,243 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <locale.h>
+#include <ctype.h>
+
+#define SIZE 2
+
+typedef struct {
+    char name[20];
+    char soket[20];
+    int price;
+    int year;
+    int yadro;
+} CPU;
+
+int writefile(const char* fname, CPU* inf, int count);
+void readfile(const char* fname, CPU** inf, int* count);
+int update(CPU* inf, const char* name, int count);
+int deleteCPU(CPU* inf, const char* name, int* count);
+int strcasecmp_custom(const char* s1, const char* s2);
+
+int main() {
+    int select;
+    int size = SIZE;
+    int count = 0;
+    CPU* inf = (CPU*)malloc(size * sizeof(CPU));
+    char fname[20] = "CPU.txt";
+    setlocale(LC_ALL, "RUS");
+
+    if (inf == NULL) {
+        printf("Ошибка выделения памяти.\n");
+        return 1;
+    }
+
+    // Загружаем данные из файла при старте
+    readfile(fname, &inf, &count);
+
+    while (1) {
+        system("cls");
+        printf("\nВыберите действие:\n");
+        printf("Вывести данные (1)\n");
+        printf("Добавить запись в базу данных (2)\n");
+        printf("Удалить записи из базы данных (3)\n");
+        printf("Изменить данные в полях (4)\n");
+        printf("Сортировать данные (5)\n");
+        printf("Закончить работу (0)\n");
+        printf("Введите цифру для нужного действия: ");
+        scanf("%d", &select);
+
+        switch (select) {
+        case 1: {
+            system("cls");
+            readfile(fname, &inf, &count);
+        } break;
+
+        case 2: {
+            while (1) {
+                system("cls");
+                if (count >= size) {
+                    char answer;
+                    printf("Достигнут предел процессоров (%d). Хотите увеличить количество? (y/n): ", size);
+                    scanf(" %c", &answer);
+                    if (answer == 'y' || answer == 'Y') {
+                        size *= 2;
+                        CPU* temp = (CPU*)realloc(inf, size * sizeof(CPU));
+                        if (temp == NULL) {
+                            printf("Ошибка при увеличении памяти.\n");
+                            free(inf);
+                            return 1;
+                        }
+                        inf = temp;
+                    }
+                    else {
+                        printf("Выход из режима добавления данных.\n");
+                        break;
+                    }
+                }
+
+                printf("Введите информацию о процессоре %d:\n", count + 1);
+                printf("Процессор (менять пробелы на '_'): ");
+                scanf("%19s", inf[count].name);
+                printf("Год: ");
+                scanf("%d", &inf[count].year);
+                printf("Цена: ");
+                scanf("%d", &inf[count].price);
+                printf("Сокет: ");
+                scanf("%19s", inf[count].soket);
+                printf("Ядро: ");
+                scanf("%d", &inf[count].yadro);
+                count++;
+
+                if (!writefile(fname, inf, count)) {
+                    printf("Ошибка при открытии файла.\n");
+                }
+                else {
+                    printf("Запись успешно добавлена.\n");
+                }
+
+                char continueAdding;
+                printf("Хотите добавить еще один процессор? (y/n): ");
+                scanf(" %c", &continueAdding);
+                if (continueAdding != 'y' && continueAdding != 'Y') {
+                    break;
+                }
+            }
+        } break;
+
+        case 3: {
+            system("cls");
+            char name[20];
+            printf("Введите имя процессора, который хотите удалить: ");
+            scanf("%19s", name);
+            if (deleteCPU(inf, name, &count)) {
+                printf("Процессор '%s' успешно удален.\n", name);
+                writefile(fname, inf, count);
+            }
+            else {
+                printf("Процессор с именем '%s' не найден.\n", name);
+            }
+        } break;
+
+        case 4: {
+            system("cls");
+            printf("Доступные процессоры:\n");
+            for (int i = 0; i < count; i++) {
+                printf(" - %s\n", inf[i].name);
+            }
+            char name[20];
+            printf("Введите имя процессора для изменения данных: ");
+            scanf("%19s", name);
+            if (update(inf, name, count)) {
+                printf("Данные успешно обновлены.\n");
+            }
+            else {
+                printf("Процессор с именем '%s' не найден.\n", name);
+            }
+        } break;
+
+        case 5: {
+            system("cls");
+            printf("Сортировка пока не реализована.\n");
+        } break;
+
+        case 0: {
+            free(inf);
+            printf("Выход из программы.\n");
+            return 0;
+        } break;
+
+        default:
+            printf("Некорректный выбор. Пожалуйста, попробуйте еще раз.\n");
+            break;
+        }
+        system("pause");
+    }
+
+    free(inf);
+    return 0;
+}
+
+int writefile(const char* fname, CPU* inf, int count) {
+    FILE* out;
+    if ((out = fopen(fname, "wt")) == NULL) {
+        printf("Ошибка при открытии файла для записи.\n");
+        return 0;
+    }
+    for (int i = 0; i < count; i++) {
+        fprintf(out, "_ПРОЦ_\nИмя: %s\nГод: %4d\nЦена: %d\nСокет: %s\nЯдро: %d\n",
+            inf[i].name, inf[i].year, inf[i].price, inf[i].soket, inf[i].yadro);
+    }
+    fclose(out);
+    return 1;
+}
+
+void readfile(const char* fname, CPU** inf, int* count) {
+    FILE* in;
+    CPU cpu;
+    *count = 0;
+
+    if ((in = fopen(fname, "rt")) == NULL) {
+        printf("Ошибка при открытии файла для чтения.\n");
+        return;
+    }
+
+    printf("Содержимое файла %s:\n", fname);
+    while (fscanf(in, "_ПРОЦ_\nИмя: %19s\nГод: %d\nЦена: %d\nСокет: %19s\nЯдро: %d\n",
+        cpu.name, &cpu.year, &cpu.price, cpu.soket, &cpu.yadro) == 5) {
+        if (*count >= SIZE) {
+            *inf = (CPU*)realloc(*inf, (*count + 1) * sizeof(CPU));
+            if (*inf == NULL) {
+                printf("Ошибка при увеличении памяти.\n");
+                fclose(in);
+                return;
+            }
+        }
+        (*inf)[*count] = cpu;
+        (*count)++;
+        printf("_ПРОЦ_\nИмя: %s\nГод: %d\nЦена: %d\nСокет: %s\nЯдро: %d\n",
+            cpu.name, cpu.year, cpu.price, cpu.soket, cpu.yadro);
+    }
+    fclose(in);
+}
+
+int strcasecmp_custom(const char* s1, const char* s2) {
+    while (*s1 && (*s1 == *s2 || tolower(*s1) == tolower(*s2))) {
+        s1++;
+        s2++;
+    }
+    return tolower(*(unsigned char*)s1) - tolower(*(unsigned char*)s2);
+}
+
+int update(CPU* inf, const char* name, int count) {
+    for (int i = 0; i < count; i++) {
+        if (strcasecmp_custom(inf[i].name, name) == 0) {
+            printf("Введите новые данные для процессора '%s':\n", inf[i].name);
+            printf("Новый год: ");
+            scanf("%d", &inf[i].year);
+            printf("Новая цена: ");
+            scanf("%d", &inf[i].price);
+            printf("Новый сокет: ");
+            scanf("%19s", inf[i].soket);
+            printf("Новое количество ядер: ");
+            scanf("%d", &inf[i].yadro);
+            writefile("CPU.txt", inf, count);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int deleteCPU(CPU* inf, const char* name, int* count) {
+    for (int i = 0; i < *count; i++) {
+        if (strcasecmp_custom(inf[i].name, name) == 0) {
+            for (int j = i; j < *count - 1; j++) {
+                inf[j] = inf[j + 1];
+            }
+            (*count)--; 
+            return 1; 
+        }
+    }
+    return 0;
+}
