@@ -1,0 +1,158 @@
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <locale.h>
+#define K 10
+#define N 100
+#define R 50
+void print_choice(int choice) {
+    switch (choice) {
+    case 0: printf("Камень\n"); break;
+    case 1: printf("Ножницы\n"); break;
+    case 2: printf("Бумага\n"); break;
+    }
+}
+
+int rand10(int mmax) {
+    return (rand() % mmax) + 1;
+}
+
+double rand_double(double dmin, double dmax) {
+    return dmin + (rand() / (RAND_MAX / (dmax - dmin)));
+}
+
+int* rand10_array(int n, int mmax) {
+    int* arr = (int*)malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) {
+        arr[i] = rand10(mmax);
+    }
+    return arr;
+}
+
+double* rand_double_array(int n, double dm) {
+    double* arr = (double*)malloc(n * sizeof(double));
+    for (int i = 0; i < n; i++) {
+        arr[i] = rand_double(-dm, dm);
+    }
+    return arr;
+}
+void bubble_sort(int* arr, int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+int main() {
+    setlocale(LC_ALL, "RUS");
+    int m = 1 + rand() % 10;
+    int k, choice;
+    printf("number?");
+    scanf("%d", &k);
+    if (k == m)
+    {
+        printf("perfect %d=%d", &m, &k);
+    }
+    else {
+        printf("Bad m = %d", &m);
+    }
+    srand(time(NULL));
+    int user_choice, computer_choice;
+    printf("\nВыберите:\n0 - Камень\n1 - Ножницы\n2 - Бумага\n");
+    printf("\nВаш выбор: ");
+    scanf("%d", &user_choice);
+    if (user_choice < 0 || user_choice > 2) {
+        printf("Неверный выбор! Пожалуйста, выберите 0, 1 или 2.\n");
+        return 1;
+    }
+    computer_choice = rand() % 3;
+    printf("Ваш выбор: ");
+    print_choice(user_choice);
+    printf("Выбор компьютера: ");
+    print_choice(computer_choice);
+    if (user_choice == computer_choice) {
+        printf("Ничья!\n");
+    }
+    else if ((user_choice == 0 && computer_choice == 1) ||
+        (user_choice == 1 && computer_choice == 2) ||
+        (user_choice == 2 && computer_choice == 0)) {
+        printf("Вы выиграли!\n");
+    }
+    else {
+        printf("Вы проиграли!\n");
+    }
+    //задание 2
+    int mmax = 10;
+    printf("Случайное целое число от 1 до %d: %d\n", mmax, rand10(mmax));
+    double dmin = 1.0, dmax = 5.0;
+    printf("Случайное вещественное число от %.2f до %.2f: %.2f\n", dmin, dmax, rand_double(dmin, dmax));
+    int n = 5;
+    int* int_array = rand10_array(n, mmax);
+    printf("Массив случайных целых чисел: ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", int_array[i]);
+    }
+    printf("\n");
+    free(int_array);
+    double dm = 10.0;
+    double* double_array = rand_double_array(n, dm);
+    printf("Массив случайных вещественных чисел: ");
+    for (int i = 0; i < n; i++) {
+        printf("%.2f ", double_array[i]);
+    }
+    printf("\n");
+    //Задание 3
+    int counter[K + 1] = { 0 };
+
+    int* array = rand10_array(N, K);
+
+    for (int i = 0; i < N; i++) {
+        counter[array[i]]++;
+    }
+
+    int nmax = 0;
+    for (int i = 1; i <= K; i++) {
+        if (counter[i] > nmax) {
+            nmax = counter[i];
+        }
+    }
+
+    printf("Гистограмма частоты значений:\n");
+    for (int i = 1; i <= K; i++) {
+        int x = (counter[i] * R) / nmax;
+        printf("%2d | ", i);
+        for (int j = 0; j < x; j++) {
+            printf("*");
+        }
+        printf(" (%d)\n", counter[i]);
+    }
+    // Сортировка положительных элементов массива
+    int positive_count = 0;
+    for (int i = 0; i < N; i++) {
+        if (array[i] > 0) {
+            positive_count++;
+        }
+    }
+
+    int* positive_array = (int*)malloc(positive_count * sizeof(int));
+    int index = 0;
+    for (int i = 0; i < N; i++) {
+        if (array[i] > 0) {
+            positive_array[index++] = array[i];
+        }
+    }
+
+    bubble_sort(positive_array, positive_count);
+    printf("Отсортированные положительные элементы:\n");
+    for (int i = 0; i < positive_count; i++) {
+        printf("%d ", positive_array[i]);
+    }
+    printf("\n");
+    free(array);
+    free(positive_array);
+    return 0;
+}
