@@ -1,0 +1,135 @@
+#include <stdio.h>
+#include <locale.h>
+#include <stdlib.h>
+#include <time.h>
+
+void sort_bubble(int* ptrarr, int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - 1 - i; j++) {
+            if (ptrarr[j] > ptrarr[j + 1]) {
+                int temp = ptrarr[j];
+                ptrarr[j] = ptrarr[j + 1];
+                ptrarr[j + 1] = temp;
+            }
+        }
+    }
+}
+
+void sort_kokteil(int* ptrarr, int n) {
+    int ileft = 0;
+    int iright = n - 1;
+    while (ileft < iright) {
+        for (int i = ileft; i < iright; i++) {
+            if (ptrarr[i] > ptrarr[i + 1]) {
+                int temp = ptrarr[i];
+                ptrarr[i] = ptrarr[i + 1];
+                ptrarr[i + 1] = temp;
+            }
+        }
+        iright--;
+
+        for (int i = iright; i > ileft; i--) {
+            if (ptrarr[i] < ptrarr[i - 1]) {
+                int temp = ptrarr[i];
+                ptrarr[i] = ptrarr[i - 1];
+                ptrarr[i - 1] = temp;
+            }
+        }
+        ileft++;
+    }
+}
+
+void sort_select(int* ptrarr, int n) {
+    for (int i = 0; i < n - 1; i++) {
+        int min_index = i;
+        for (int j = i + 1; j < n; j++) {
+            if (ptrarr[j] < ptrarr[min_index]) {
+                min_index = j;
+            }
+        }
+        if (min_index != i) {
+            int temp = ptrarr[i];
+            ptrarr[i] = ptrarr[min_index];
+            ptrarr[min_index] = temp;
+        }
+    }
+}
+
+void sort_insert(int* ptrarr, int n) {
+    for (int i = 1; i < n; i++) {
+        int temp = ptrarr[i];
+        int j = i - 1;
+        while (j >= 0 && ptrarr[j] > temp) {
+            ptrarr[j + 1] = ptrarr[j];
+            j--;
+        }
+        ptrarr[j + 1] = temp;
+    }
+}
+int* full_array(int size, int min, int max) {
+    int* arr = (int*)malloc(size * sizeof(int));
+    if (arr == NULL) {
+        printf("Ошибка выделения памяти\n");
+        exit(1);
+    }
+    for (int i = 0; i < size; i++) {
+        arr[i] = min + rand() % (max - min + 1);
+    }
+    return arr;
+}
+
+void print_array(int* ptrarr, int n) {
+    for (int i = 0; i < n; i++) {
+        printf("%d ", ptrarr[i]);
+    }
+    printf("\n");
+}
+int main() {
+    //Задание 1
+    setlocale(LC_ALL, "RUS");
+    int arr[] = { 64, 45, 32, 4, 27, 12, 90 };
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    printf("Исходный массив:\n");
+    print_array(arr, n);
+
+    sort_bubble(arr, n);
+    printf("Отсортированный массив (пузырьковая сортировка):\n");
+    print_array(arr, n);
+
+    int arr2[] = { 64, 45, 32, 4, 27, 12, 90 };
+    sort_kokteil(arr2, n);
+    printf("Отсортированный массив (шейкерная сортировка):\n");
+    print_array(arr2, n);
+
+    int arr3[] = { 64, 45, 32, 4, 27, 12, 90 };
+    sort_select(arr3, n);
+    printf("Отсортированный массив (сортировка выбором):\n");
+    print_array(arr3, n);
+
+    int arr4[] = { 64, 45, 32, 4, 27, 12, 90 };
+    sort_insert(arr4, n);
+    printf("Отсортированный массив (сортировка вставками):\n");
+    print_array(arr4, n);
+
+    //Задание 2
+    int size, min, max; 
+    printf("Введите размер массива: ");
+    scanf("%d", &size);
+    printf("Введите минимальное значение: ");
+    scanf("%d", &min); 
+    printf("Введите максимальное значение: ");
+    scanf("%d", &max); 
+    srand(time(NULL));
+    int* ptrarr = full_array(size, min, max);  
+    printf("Исходный массив:\n");
+    print_array(ptrarr, size);
+    clock_t t = clock();
+    sort_insert(ptrarr, size);
+    double time_taken = (double)(clock() - t) / CLOCKS_PER_SEC;
+    printf("Отсортированный массив:\n");
+    print_array(ptrarr, size);
+    printf("Время выполнения сортировки вставками: %f секунд\n", time_taken);
+    free(ptrarr);
+    return 0;
+}
