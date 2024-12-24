@@ -1,8 +1,10 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
 #include <ctype.h>
+
 
 #define SIZE 2
 
@@ -15,13 +17,13 @@ typedef struct {
 } CPU;
 
 int writefile(const char* fname, CPU* inf, int count);
-void readfile(const char* fname, CPU** inf, int* count);
-int update(CPU* inf, const char* name, int count);
-int deleteCPU(CPU* inf, const char* name, int* count);
+CPU* readfile(const char* fname, CPU** inf, int* count);
+CPU* update(CPU* inf, const char* name, int count);
+CPU* deleteCPU(CPU* inf, const char* name, int* count);
 int strcasecmp_custom(const char* s1, const char* s2);
 void searchCPU(const char* fname, const char* query);
-void bubble_sort_by_name(CPU* cpus, int count);
-void bubble_sort_by_price(CPU* cpus, int count);
+CPU* bubble_sort_by_name(CPU* cpus, int count);
+CPU* bubble_sort_by_price(CPU* cpus, int count);
 
 int main() {
     int select;
@@ -204,15 +206,15 @@ int writefile(const char* fname, CPU* inf, int count) {
         return 0;
     }
     fprintf(out, "\tИмя\tГод\tЦена\tСокет\tЯдро\n");
-    for (int i = 0; i < count; i++) { 
+    for (int i = 0; i < count; i++) {
         fprintf(out, "|%20s\t|%4d\t|%5d %7s\t|%2d\n|",
-            inf[i].name, inf[i].year, inf[i].price, inf[i].soket, inf[i].yadro); 
-    } 
+            inf[i].name, inf[i].year, inf[i].price, inf[i].soket, inf[i].yadro);
+    }
     fclose(out);
     return 1;
 }
 
-void readfile(const char* fname, CPU** inf, int* count) {
+CPU* readfile(const char* fname, CPU** inf, int* count) {
     FILE* in;
     CPU cpu;
     *count = 0;
@@ -232,7 +234,6 @@ void readfile(const char* fname, CPU** inf, int* count) {
             if (*inf == NULL) {
                 printf("Ошибка при увеличении памяти.\n");
                 fclose(in);
-                return;
             }
         }
         (*inf)[*count] = cpu;
@@ -241,6 +242,7 @@ void readfile(const char* fname, CPU** inf, int* count) {
             cpu.name, cpu.year, cpu.price, cpu.soket, cpu.yadro);
     }
     fclose(in);
+    return inf;
 }
 
 
@@ -252,7 +254,7 @@ int strcasecmp_custom(const char* s1, const char* s2) {
     return tolower(*(unsigned char*)s1) - tolower(*(unsigned char*)s2);
 }
 
-int update(CPU* inf, const char* name, int count) {
+CPU* update(CPU* inf, const char* name, int count) {
     for (int i = 0; i < count; i++) {
         if (strcasecmp_custom(inf[i].name, name) == 0) {
             printf("Введите новые данные для процессора '%s':\n", inf[i].name);
@@ -268,20 +270,19 @@ int update(CPU* inf, const char* name, int count) {
             return 1;
         }
     }
-    return 0;
+    return inf;
 }
 
-int deleteCPU(CPU* inf, const char* name, int* count) {
+CPU* deleteCPU(CPU* inf, const char* name, int* count) {
     for (int i = 0; i < *count; i++) {
         if (strcasecmp_custom(inf[i].name, name) == 0) {
             for (int j = i; j < *count - 1; j++) {
                 inf[j] = inf[j + 1];
             }
             (*count)--;
-            return 1;
         }
     }
-    return 0;
+    return inf;
 }
 
 void searchCPU(const char* fname, const char* query) {
@@ -294,21 +295,21 @@ void searchCPU(const char* fname, const char* query) {
     CPU cpu;
     int found = 0;
     char buffer[256];
-    fgets(buffer, sizeof(buffer), file); 
+    fgets(buffer, sizeof(buffer), file);
     while (fscanf(file, "|%20s\t|%4d\t|%5d %7s\t|%2d\n|",
         cpu.name, &cpu.year, &cpu.price, cpu.soket, &cpu.yadro) == 5) {
         if (strcasecmp_custom(cpu.name, query) == 0 || strcasecmp_custom(cpu.soket, query) == 0) {
             printf("Найден процессор:\n");
             printf("\tНазвание\tГод\tЦена\tСокет\tЯдро\n");
             printf("|%20s\t|%4d\t|%5d %7s\t|%2d\n|",
-                cpu.name, cpu.year, cpu.price, cpu.soket, cpu.yadro); 
+                cpu.name, cpu.year, cpu.price, cpu.soket, cpu.yadro);
             found = 1;
         }
     }
     fclose(file);
 }
 
-void bubble_sort_by_name(CPU* cpus, int count) {
+CPU* bubble_sort_by_name(CPU* cpus, int count) {
     for (int i = 0; i < count - 1; i++) {
         for (int j = 0; j < count - i - 1; j++) {
             if (strcmp(cpus[j].name, cpus[j + 1].name) > 0) {
@@ -318,9 +319,10 @@ void bubble_sort_by_name(CPU* cpus, int count) {
             }
         }
     }
+    return cpus;
 }
 
-void bubble_sort_by_price(CPU* cpus, int count) {
+CPU* bubble_sort_by_price(CPU* cpus, int count) {
     for (int i = 0; i < count - 1; i++) {
         for (int j = 0; j < count - i - 1; j++) {
             if (cpus[j].price > cpus[j + 1].price) {
@@ -330,4 +332,5 @@ void bubble_sort_by_price(CPU* cpus, int count) {
             }
         }
     }
+    return cpus;
 }
