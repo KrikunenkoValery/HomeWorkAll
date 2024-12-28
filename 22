@@ -1,0 +1,192 @@
+#define _CRT_SECURE_NO_DEPRECATE
+#include <stdio.h>
+#include <stdlib.h>
+#include <locale.h>
+
+#include <math.h>
+
+#include <time.h>
+
+typedef double (*func)(double);
+
+double func_Y(double x);
+double func_V(double x);
+double func_S(double x);
+
+void print_result(func func, double begin, double end, double step);
+
+void func_in_file(func func, double x);
+
+int calculate(func func, double *x, int size);
+
+void main() {
+  setlocale(LC_CTYPE, "RUS");
+
+  // 1
+
+  double begin, end, step;
+  printf("Введите начальное значение, конечное значение и шаг: ");
+  scanf("%lf%lf%lf", &begin, &end, &step);
+
+  print_result(func_V, begin, end, step);
+
+  // 2 1
+
+  printf("%s, %s, %s, %s, %s",
+    "Выберите действие",
+    "1 - Вычислить значение",
+    "2 - Табулировать",
+    "3 - Выполнить операцию",
+    "4 - Выход\n");
+  int action;
+  func func;
+  scanf("%d", &action);
+  
+  switch (action) {
+  case 1:
+    printf("Выберите функцию(1 - S(x), 2 - V(x),3 - Y(x): ");
+
+    scanf("%d", &action);
+    switch (action) {
+    case 1:
+      func = func_S;
+      break;
+    case 2:
+      func = func_V;
+      break;
+    case 3:
+      func = func_Y;
+      break;
+    default:
+      printf("Введено неправильное значение.");
+      return 0;
+    }
+
+    printf("Введите значение x типа lf: ");
+    double x;
+    scanf("%lf", &x);
+    printf("Значение функции при заданом x - %lf\n", func(x));
+
+    break;
+  case 2:
+    printf("Выберите функцию(1 - S(x), 2 - V(x),3 - Y(x): ");
+
+    scanf("%d", &action);
+    switch (action) {
+    case 1:
+      func = func_S;
+      break;
+    case 2:
+      func = func_V;
+      break;
+    case 3:
+      func = func_Y;
+      break;
+    default:
+      printf("Введено неправильное значение.");
+      return 0;
+    }
+
+    printf("Введите начальное значение, конечное значение и шаг: ");
+    scanf("%lf%lf%lf", &begin, &end, &step);
+
+    print_result(func_V, begin, end, step);
+    printf("\n");
+
+    break;
+  case 3:
+    printf("Выберите функцию(1 - S(x), 2 - V(x),3 - Y(x): ");
+
+    scanf("%d", &action);
+    switch (action) {
+    case 1:
+      func = func_S;
+      break;
+    case 2:
+      func = func_V;
+      break;
+    case 3:
+      func = func_Y;
+      break;
+    default:
+      printf("Введено неправильное значение.\n");
+      return 0;
+    }
+
+    printf("Введите значение x типа lf: ");
+    scanf("%lf", &x);
+    func_in_file(func, x);
+
+    break;
+  case 4:
+    return 1;
+  default:
+    printf("Введена неправильная цифра\n");
+  }
+
+  // 3 5
+
+  srand(time(NULL));
+
+  double* arr;
+  int size = 10;
+  
+  if ((arr = (double*)calloc(size, sizeof(double))) == NULL)
+    return 0;
+
+  for (int i = 0; i < size; i++) {
+    arr[i] = rand() / 10000.;
+    printf("%lf ", func_V(arr[i]));
+  }
+
+  printf("\nКоличество положительных элементов %d", calculate(func_V, arr, size));
+}
+
+double func_Y(double x) {
+  return x > 0 ? log(abs(sqrt(pow(x, 3)))) : 0;
+}
+
+double func_V(double x) {
+  if (x < 0) return exp(cos(x));
+
+  if (x > 1) return sqrt(tan(pow(x, 2) - 1));
+  
+  return -2 * x;
+}
+
+double func_S(double x) {
+  double res = 0;
+
+  for (int i = 0; i < 8; i += 2) {
+    res += (1. / i) * pow((x - 1) / (x + 1), i);
+  }
+  
+  return res;
+}
+
+void print_result(func func, double begin, double end, double step) {
+  for (double x = begin; x <= end; x += step)
+    printf("| x = %6.3lf | y = %8.5lf |\n", x, func(x));
+}
+
+void func_in_file(func func, double x) {
+  FILE* file;
+  if (file = fopen("file.txt", "wt"))
+    return NULL;
+
+  fprintf(file, "%lf, %lf", x, func(x));
+
+  fclose(file);
+}
+
+int calculate(func func, double* x, int size) {
+  if (x == NULL)
+    return -1;
+
+  int amount = 0;
+  for (int i = 0; i < size; i++)
+    if (func(x[i]) >= 0)
+      amount += 1;
+
+  return amount;
+}
