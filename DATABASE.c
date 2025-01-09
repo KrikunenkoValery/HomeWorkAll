@@ -1,10 +1,12 @@
+#define _CRT_SECURE_NO_WARNINGS
+#define SIZE 5
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
 #include <ctype.h>
 
-#define SIZE 2
 
 typedef struct {
     char name[20];
@@ -15,10 +17,13 @@ typedef struct {
 } CPU;
 
 int writefile(const char* fname, CPU* inf, int count);
-void readfile(const char* fname, CPU** inf, int* count);
-int update(CPU* inf, const char* name, int count);
-int deleteCPU(CPU* inf, const char* name, int* count);
+CPU* readfile(const char* fname, CPU** inf, int* count);
+CPU* update(CPU* inf, const char* name, int count);
+CPU* deleteCPU(CPU* inf, const char* name, int* count);
 int strcasecmp_custom(const char* s1, const char* s2);
+void searchCPU(const char* fname, const char* query);
+CPU* bubble_sort_by_name(CPU* cpus, int count);
+CPU* bubble_sort_by_price(CPU* cpus, int count);
 
 int main() {
     int select;
@@ -33,7 +38,6 @@ int main() {
         return 1;
     }
 
-    // Загружаем данные из файла при старте
     readfile(fname, &inf, &count);
 
     while (1) {
@@ -44,6 +48,7 @@ int main() {
         printf("Удалить записи из базы данных (3)\n");
         printf("Изменить данные в полях (4)\n");
         printf("Сортировать данные (5)\n");
+        printf("Поиск процессора по имени или сокету (6)\n");
         printf("Закончить работу (0)\n");
         printf("Введите цифру для нужного действия: ");
         scanf("%d", &select);
@@ -108,6 +113,10 @@ int main() {
 
         case 3: {
             system("cls");
+            printf("Доступные процессоры:\n");
+            for (int i = 0; i < count; i++) {
+                printf(" - %s\n", inf[i].name);
+            }
             char name[20];
             printf("Введите имя процессора, который хотите удалить: ");
             scanf("%19s", name);
@@ -139,7 +148,38 @@ int main() {
 
         case 5: {
             system("cls");
-            printf("Сортировка пока не реализована.\n");
+            int sort_choice;
+            printf("Выберите способ сортировки:\n");
+            printf("1. По имени процессора\n");
+            printf("2. По цене\n");
+            printf("Введите цифру для выбора: ");
+            scanf("%d", &sort_choice);
+
+            if (sort_choice == 1) {
+                bubble_sort_by_name(inf, count);
+            }
+            else if (sort_choice == 2) {
+                bubble_sort_by_price(inf, count);
+            }
+            else {
+                printf("Некорректный ввод.\n");
+                break;
+            }
+
+            writefile(fname, inf, count);
+            printf("Данные отсортированы.\n");
+        } break;
+
+        case 6: {
+            system("cls");
+            printf("Доступные процессоры:\n");
+            for (int i = 0; i < count; i++) {
+                printf(" - %s\n", inf[i].name);
+            }
+            char query[20];
+            printf("Введите имя процессора или сокет для поиска: ");
+            scanf("%19s", query);
+            searchCPU(fname, query);
         } break;
 
         case 0: {
@@ -165,15 +205,16 @@ int writefile(const char* fname, CPU* inf, int count) {
         printf("Ошибка при открытии файла для записи.\n");
         return 0;
     }
+    fprintf(out, "\tИмя\tГод\tЦена\tСокет\tЯдро\n");
     for (int i = 0; i < count; i++) {
-        fprintf(out, "_ПРОЦ_\nИмя: %s\nГод: %4d\nЦена: %d\nСокет: %s\nЯдро: %d\n",
+        fprintf(out, "|%20s\t|%4d\t|%5d %7s\t|%2d\n|",
             inf[i].name, inf[i].year, inf[i].price, inf[i].soket, inf[i].yadro);
     }
     fclose(out);
     return 1;
 }
 
-void readfile(const char* fname, CPU** inf, int* count) {
+CPU* readfile(const char* fname, CPU** inf, int* count) {
     FILE* in;
     CPU cpu;
     *count = 0;
@@ -182,25 +223,28 @@ void readfile(const char* fname, CPU** inf, int* count) {
         printf("Ошибка при открытии файла для чтения.\n");
         return;
     }
-
+    char buffer[256];
+    fgets(buffer, sizeof(buffer), in);
     printf("Содержимое файла %s:\n", fname);
-    while (fscanf(in, "_ПРОЦ_\nИмя: %19s\nГод: %d\nЦена: %d\nСокет: %19s\nЯдро: %d\n",
+    printf("\tНазвание\tГод\tЦена\tСокет\tЯдро\n");
+    while (fscanf(in, "|%20s\t|%4d\t|%5d %7s\t|%2d\n|",
         cpu.name, &cpu.year, &cpu.price, cpu.soket, &cpu.yadro) == 5) {
         if (*count >= SIZE) {
             *inf = (CPU*)realloc(*inf, (*count + 1) * sizeof(CPU));
             if (*inf == NULL) {
                 printf("Ошибка при увеличении памяти.\n");
                 fclose(in);
-                return;
             }
         }
         (*inf)[*count] = cpu;
         (*count)++;
-        printf("_ПРОЦ_\nИмя: %s\nГод: %d\nЦена: %d\nСокет: %s\nЯдро: %d\n",
+        printf("%20s\t%4d\t%5d\t%7s\t%2d\n",
             cpu.name, cpu.year, cpu.price, cpu.soket, cpu.yadro);
     }
     fclose(in);
+    return inf;
 }
+
 
 int strcasecmp_custom(const char* s1, const char* s2) {
     while (*s1 && (*s1 == *s2 || tolower(*s1) == tolower(*s2))) {
@@ -210,7 +254,7 @@ int strcasecmp_custom(const char* s1, const char* s2) {
     return tolower(*(unsigned char*)s1) - tolower(*(unsigned char*)s2);
 }
 
-int update(CPU* inf, const char* name, int count) {
+CPU* update(CPU* inf, const char* name, int count) {
     for (int i = 0; i < count; i++) {
         if (strcasecmp_custom(inf[i].name, name) == 0) {
             printf("Введите новые данные для процессора '%s':\n", inf[i].name);
@@ -226,18 +270,67 @@ int update(CPU* inf, const char* name, int count) {
             return 1;
         }
     }
-    return 0;
+    return inf;
 }
 
-int deleteCPU(CPU* inf, const char* name, int* count) {
+CPU* deleteCPU(CPU* inf, const char* name, int* count) {
     for (int i = 0; i < *count; i++) {
         if (strcasecmp_custom(inf[i].name, name) == 0) {
             for (int j = i; j < *count - 1; j++) {
                 inf[j] = inf[j + 1];
             }
-            (*count)--; 
-            return 1; 
+            (*count)--;
         }
     }
-    return 0;
+    return inf;
+}
+
+void searchCPU(const char* fname, const char* query) {
+    FILE* file = fopen(fname, "rt");
+    if (file == NULL) {
+        perror("Ошибка открытия файла");
+        return;
+    }
+
+    CPU cpu;
+    int found = 0;
+    char buffer[256];
+    fgets(buffer, sizeof(buffer), file);
+    while (fscanf(file, "|%20s\t|%4d\t|%5d %7s\t|%2d\n|",
+        cpu.name, &cpu.year, &cpu.price, cpu.soket, &cpu.yadro) == 5) {
+        if (strcasecmp_custom(cpu.name, query) == 0 || strcasecmp_custom(cpu.soket, query) == 0) {
+            printf("Найден процессор:\n");
+            printf("\tНазвание\tГод\tЦена\tСокет\tЯдро\n");
+            printf("|%20s\t|%4d\t|%5d %7s\t|%2d\n|",
+                cpu.name, cpu.year, cpu.price, cpu.soket, cpu.yadro);
+            found = 1;
+        }
+    }
+    fclose(file);
+}
+
+CPU* bubble_sort_by_name(CPU* cpus, int count) {
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            if (strcmp(cpus[j].name, cpus[j + 1].name) > 0) {
+                CPU temp = cpus[j];
+                cpus[j] = cpus[j + 1];
+                cpus[j + 1] = temp;
+            }
+        }
+    }
+    return cpus;
+}
+
+CPU* bubble_sort_by_price(CPU* cpus, int count) {
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            if (cpus[j].price > cpus[j + 1].price) {
+                CPU temp = cpus[j];
+                cpus[j] = cpus[j + 1];
+                cpus[j + 1] = temp;
+            }
+        }
+    }
+    return cpus;
 }
