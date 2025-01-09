@@ -1,12 +1,12 @@
 #define _CRT_SECURE_NO_WARNINGS
+#define SIZE 5
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
 #include <ctype.h>
 
-
-#define SIZE 2
 
 typedef struct {
     char name[20];
@@ -238,7 +238,7 @@ CPU* readfile(const char* fname, CPU** inf, int* count) {
         }
         (*inf)[*count] = cpu;
         (*count)++;
-        printf("%20s\t%4d\t%5d %7s\t%2d\n",
+        printf("%20s\t%4d\t%5d\t%7s\t%2d\n",
             cpu.name, cpu.year, cpu.price, cpu.soket, cpu.yadro);
     }
     fclose(in);
