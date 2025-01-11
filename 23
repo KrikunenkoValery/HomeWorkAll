@@ -1,0 +1,304 @@
+#define _CRT_SECURE_NO_DEPRECATE
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <locale.h>
+
+#include <string.h>
+
+#include <time.h>
+
+#define RMAX 100
+
+#ifndef _LIST_H
+
+#define _LIST_H
+
+struct listitem {
+	int num;
+	char name[80];
+	struct listitem* next;
+};
+
+typedef struct listitem* List;
+
+void initlist(List* list);
+
+void insertfront(List* list, int value);
+
+void insertback(List* list, int value);
+
+void insertfront_str(List* list, char* value);
+
+void insertback_str(List* list, char* value);
+
+int length(List list);
+
+void destroy_item(List* list, List node);
+
+List get_by_num(List list, int num);
+
+List get_by_name(List list, char* name);
+
+void display_list(List list);
+
+int get_num(List* list, int index);
+
+List copy_list(List* list);
+
+void free_list(List* list);
+
+#endif // !_LIST_H
+
+int main() {
+	system("chcp 1251");
+	srand(time(NULL));
+
+	// 2 1
+
+	List list = NULL;
+	initlist(&list);
+
+	printf("Введите количество элементов списка >> ");
+
+	int n;
+	scanf("%d", &n);
+
+	for (int i = 0; i < n; i++)
+		insertback(&list, rand() % RMAX);
+
+	display_list(list);
+
+	int sum = 0;
+	for (int i = 0; i < length(list); i++)
+		sum += get_num(&list, i);
+
+	sum /= n;
+
+	printf("Среденее арифметическое списка: %d\n", sum);
+
+	int len = length(list);
+
+	List sub_list = copy_list(&list);
+
+	for (int i = 0; i < len; i++) {
+		int num = get_num(&sub_list, i);
+		if (num > sum)
+			destroy_item(&list, get_by_num(list, num));
+	}
+
+	free_list(&sub_list);
+
+	display_list(list);
+
+	free_list(&list);
+}
+
+void initlist(List* list) {
+
+	*list = NULL;
+}
+
+void insertfront(List* list, int value) {
+
+	List new_node = (List)malloc(sizeof(struct listitem));
+	if (new_node == NULL)
+		return;
+
+	new_node->num = value;
+	strcpy(new_node->name, "");
+	new_node->next = *list;
+
+	*list = new_node;
+}
+
+void insertback(List* list, int value) {
+
+	List new_node = (List)malloc(sizeof(struct listitem));
+	if (new_node == NULL)
+		return;
+
+	new_node->num = value;
+	strcpy(new_node->name, "");
+	new_node->next = NULL;
+
+	if (*list == NULL)
+		*list = new_node;
+	else {
+		List cursor = *list;
+
+		while (cursor->next != NULL)
+			cursor = cursor->next;
+
+		cursor->next = new_node;
+	}
+
+}
+
+int length(List list) {
+
+	if (!list)
+		return -1;
+
+	List cursor = list;
+
+	int i = 0;
+	while (cursor != NULL) {
+		i++;
+		cursor = cursor->next;
+	}
+
+	return i;
+}
+
+void insertfront_str(List* list, char* value) {
+
+	List new_node = (List)malloc(sizeof(struct listitem));
+	if (!new_node)
+		return;
+
+	new_node->num = 0;
+	strcpy(new_node->name, value);
+	new_node->next = *list;
+	*list = new_node;
+}
+
+void insertback_str(List* list, char* value) {
+
+	List new_node = (List)malloc(sizeof(struct listitem));
+	if (!new_node)
+		return;
+
+	new_node->num = 0;
+	strcpy(new_node->name, value);
+	new_node->next = NULL;
+
+	if (!list)
+		*list = new_node;
+	else {
+		List cursor = *list;
+
+		while (cursor->next)
+			cursor = cursor->next;
+
+		cursor->next = new_node;
+	}
+}
+
+void destroy_item(List* list, List node) {
+
+	if (list == NULL)
+		return;
+
+	if (node == NULL)
+		return;
+
+	if (*list == node) {
+		*list = node->next;
+		free(node);
+		return;
+	}
+
+	List cursor = *list;
+	List previous = NULL;
+
+	while (((strcmp(cursor->name, node->name) != 0) || (cursor->num != node->num)) && cursor) {
+		previous = cursor;
+		cursor = cursor->next;
+	}
+
+	if (cursor == NULL)
+		return;
+
+	previous->next = cursor->next;
+
+	free(cursor);
+}
+
+List get_by_num(List list, int num) {
+
+	List cursor = list;
+	while (cursor->num != num && cursor->next != NULL)
+		cursor = cursor->next;
+
+	if (cursor->num == num)
+		return cursor;
+
+	return NULL;
+}
+
+List get_by_name(List list, char* name) {
+
+	List cursor = list;
+	while (strcmp(cursor->name, name) != 0 && cursor->next != NULL)
+		cursor = cursor->next;
+
+	if (cursor->name == name)
+		return cursor;
+
+	return NULL;
+}
+
+void display_list(List list) {
+
+	if (list == NULL) {
+		printf("\nasdas");
+		return;
+	}
+
+	List cursor = list;
+	while (cursor != NULL) {
+		printf("| %i, %s ", cursor->num, cursor->name);
+		cursor = cursor->next;
+	}
+
+	printf("|\n");
+}
+
+int get_num(List* list, int index) {
+
+	if (*list == NULL)
+		return;
+
+	List cursor = *list;
+	for (int i = 0; i < index; i++) {
+		if (cursor->next == NULL)
+			return;
+
+		cursor = cursor->next;
+	}
+
+	return cursor->num;
+}
+
+List copy_list(List* list) {
+
+	if (*list == NULL)
+		return NULL;
+
+	List new_list;
+	initlist(&new_list);
+
+	List cursor = *list;
+	while (cursor != NULL) {
+		insertback(&new_list, cursor->num);
+		cursor = cursor->next;
+	}
+
+	return new_list;
+}
+
+void free_list(List* list) {
+
+	if (*list == NULL)
+		return;
+
+	List cursor = *list;
+	List previous = NULL;
+
+	while (cursor != NULL) {
+		previous = cursor;
+		cursor = cursor->next;
+		free(previous);
+	}
+}
